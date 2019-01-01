@@ -113,8 +113,8 @@ namespace QueryBySize
                  select file)
                 .First();
 
-            WriteToTextFile(string.Format("The largest file under {0} is {1} with a length of {2} bytes",
-                                startFolder, longestFile.FullName, longestFile.Length));
+            WriteToTextFile(string.Format("The largest file under {0} is {1} with a length of {2}",
+                                startFolder, longestFile.FullName, ConverToMbAndGb(longestFile.Length)));
 
             Console.WriteLine("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now));
@@ -127,8 +127,8 @@ namespace QueryBySize
                  orderby len ascending
                  select file).First();
 
-            WriteToTextFile(string.Format("The smallest file under {0} is {1} with a length of {2} bytes",
-                                startFolder, smallestFile.FullName, smallestFile.Length));
+            WriteToTextFile(string.Format("The smallest file under {0} is {1} with a length of {2}",
+                                startFolder, smallestFile.FullName, ConverToMbAndGb(smallestFile.Length)));
 
             Console.WriteLine("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now));
@@ -145,7 +145,7 @@ namespace QueryBySize
 
             foreach (var v in queryTenLargest)
             {
-                WriteToTextFile(string.Format("{0}: {1} bytes", v.FullName, v.Length));
+                WriteToTextFile(string.Format("{0}: {1}", v.FullName, ConverToMbAndGb(v.Length)));
             }
 
             Console.WriteLine("Return the FileInfos for the 10 largest file DONE @ {0}", DateTime.Now);
@@ -170,7 +170,7 @@ namespace QueryBySize
                     WriteToTextFile(string.Format(filegroup.Key.ToString() + "00000"));
                     foreach (var item in filegroup)
                     {
-                        WriteToTextFile(string.Format("\t{0}: {1}", item.Name, item.Length));
+                        WriteToTextFile(string.Format("\t{0}: {1}", item.Name, ConverToMbAndGb(item.Length)));
                     }
                 }
 
@@ -182,7 +182,20 @@ namespace QueryBySize
                 Console.WriteLine("performQuerySizeGroupItem is FALSE.   DONE @ {0}", DateTime.Now);
             }
 
-            Console.WriteLine("End: ", DateTime.Now);
+            Console.WriteLine("End: {0}", DateTime.Now);
+        }
+
+        static string ConverToMbAndGb(long bytes)
+        {
+            string megabytes1 = string.Format("{0} megabytes", ConvertSize(bytes, "MB").ToString("0.00"));
+            string gigabytes1 = string.Format("{0} gigabytes", ConvertSize(bytes, "GB").ToString("0.00"));
+
+            return string.Format("[ {0} | {1} ]", megabytes1, gigabytes1);
+        }
+
+        static double ConvertBytesToMegabytes(long bytes)
+        {
+            return (bytes / 1024f) / 1024f;
         }
 
         // This method is used to swallow the possible exception  
@@ -202,6 +215,68 @@ namespace QueryBySize
                 retval = 0;
             }
             return retval;
+        }
+
+        /// <summary>
+        /// Function to convert the given bytes to either Kilobyte, Megabyte, or Gigabyte
+        /// </summary>
+        /// <param name="bytes">Double -> Total bytes to be converted</param>
+        /// <param name="type">String -> Type of conversion to perform</param>
+        /// <returns>Int32 -> Converted bytes</returns>
+        /// <remarks></remarks>
+        public static double ConvertSize(double bytes, string type)
+        {
+            try
+            {
+                const int CONVERSION_VALUE = 1024;
+                //determine what conversion they want
+                switch (type)
+                {
+                    case "BY":
+                        //convert to bytes (default)
+                        return bytes;
+                    case "KB":
+                        //convert to kilobytes
+                        return (bytes / CONVERSION_VALUE);
+                    case "MB":
+                        //convert to megabytes
+                        return (bytes / CalculateSquare(CONVERSION_VALUE));
+                    case "GB":
+                        //convert to gigabytes
+                        return (bytes / CalculateCube(CONVERSION_VALUE));
+                    default:
+                        //default
+                        return bytes;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Function to calculate the square of the provided number
+        /// </summary>
+        /// <param name="number">Int32 -> Number to be squared</param>
+        /// <returns>Double -> THe provided number squared</returns>
+        /// <remarks></remarks>
+        public static double CalculateSquare(Int32 number)
+        {
+            return Math.Pow(number, 2);
+        }
+
+
+        /// <summary>
+        /// Function to calculate the cube of the provided number
+        /// </summary>
+        /// <param name="number">Int32 -> Number to be cubed</param>
+        /// <returns>Double -> THe provided number cubed</returns>
+        /// <remarks></remarks>
+        public static double CalculateCube(Int32 number)
+        {
+            return Math.Pow(number, 3);
         }
     }
 }
