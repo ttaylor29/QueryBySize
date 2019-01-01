@@ -13,10 +13,12 @@ namespace QueryBySize
 
         private static string writeToTextFilePath;
 
+        private static bool performQuerySizeGroupItem = false;
+
         static void Main(string[] args)
         {
             writeToTextFilePath = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_QueryBySize.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-
+            Console.WriteLine("writeToTextFilePath: {0}", writeToTextFilePath);
             WriteToTextFile(string.Format("writeToTextFilePath: {0}", writeToTextFilePath));
             QueryFilesBySize();
             Console.WriteLine("Press any key to exit");
@@ -54,8 +56,10 @@ namespace QueryBySize
         private static void QueryFilesBySize()
         {
             Console.WriteLine("Start: {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Start: {0}", DateTime.Now));
             string startFolder = @"C:\Users\Titus\Documents\";
             Console.WriteLine("startFolder: {0}", startFolder);
+            WriteToTextFile(string.Format("startFolder: {0}", startFolder));
             // Take a snapshot of the file system.  
             System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(startFolder);
 
@@ -84,6 +88,7 @@ namespace QueryBySize
             }
 
             Console.WriteLine("fileList count: ", fileList.ToString());
+            WriteToTextFile(string.Format("fileList count: ", fileList.ToString()));
 
             //Return the size of the largest file  
             long maxSize =
@@ -96,6 +101,7 @@ namespace QueryBySize
                 startFolder, maxSize));
 
             Console.WriteLine("Return the size of the largest file  DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Return the size of the largest file  DONE @ {0}", DateTime.Now));
 
             // Return the FileInfo object for the largest file  
             // by sorting and selecting from beginning of list  
@@ -111,6 +117,7 @@ namespace QueryBySize
                                 startFolder, longestFile.FullName, longestFile.Length));
 
             Console.WriteLine("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now));
 
             //Return the FileInfo of the smallest file  
             System.IO.FileInfo smallestFile =
@@ -124,6 +131,7 @@ namespace QueryBySize
                                 startFolder, smallestFile.FullName, smallestFile.Length));
 
             Console.WriteLine("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now));
 
             //Return the FileInfos for the 10 largest files  
             // queryTenLargest is an IEnumerable<System.IO.FileInfo>  
@@ -141,28 +149,38 @@ namespace QueryBySize
             }
 
             Console.WriteLine("Return the FileInfos for the 10 largest file DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Return the FileInfos for the 10 largest file DONE @ {0}", DateTime.Now));
 
-            // Group the files according to their size, leaving out  
-            // files that are less than 200000 bytes.   
-            var querySizeGroups =
-                from file in fileList
-                let len = GetFileLength(file)
-                where len > 0
-                group file by (len / 100000) into fileGroup
-                where fileGroup.Key >= 2
-                orderby fileGroup.Key descending
-                select fileGroup;
-
-            foreach (var filegroup in querySizeGroups)
+            if (performQuerySizeGroupItem == true)
             {
-                WriteToTextFile(string.Format(filegroup.Key.ToString() + "00000"));
-                foreach (var item in filegroup)
-                {
-                    WriteToTextFile(string.Format("\t{0}: {1}", item.Name, item.Length));
-                }
-            }
 
-            Console.WriteLine("Group the files according to their size, leaving out files that are less than 200000 bytes.   DONE @ {0}", DateTime.Now);
+                // Group the files according to their size, leaving out  
+                // files that are less than 200000 bytes.   
+                var querySizeGroups =
+                    from file in fileList
+                    let len = GetFileLength(file)
+                    where len > 0
+                    group file by (len / 100000) into fileGroup
+                    where fileGroup.Key >= 2
+                    orderby fileGroup.Key descending
+                    select fileGroup;
+
+                foreach (var filegroup in querySizeGroups)
+                {
+                    WriteToTextFile(string.Format(filegroup.Key.ToString() + "00000"));
+                    foreach (var item in filegroup)
+                    {
+                        WriteToTextFile(string.Format("\t{0}: {1}", item.Name, item.Length));
+                    }
+                }
+
+                Console.WriteLine("Group the files according to their size, leaving out files that are less than 200000 bytes.   DONE @ {0}", DateTime.Now);
+                WriteToTextFile(string.Format("Group the files according to their size, leaving out files that are less than 200000 bytes.   DONE @ {0}", DateTime.Now));
+            }
+            else
+            {
+                Console.WriteLine("performQuerySizeGroupItem is FALSE.   DONE @ {0}", DateTime.Now);
+            }
 
             Console.WriteLine("End: ", DateTime.Now);
         }
