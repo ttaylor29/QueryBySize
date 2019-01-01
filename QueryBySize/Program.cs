@@ -15,11 +15,23 @@ namespace QueryBySize
 
         private static bool performQuerySizeGroupItem = false;
 
+        private static int xLargesetFiles = 20;
+
+        private static string startFolder;
+        
         static void Main(string[] args)
         {
             writeToTextFilePath = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_QueryBySize.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             Console.WriteLine("writeToTextFilePath: {0}", writeToTextFilePath);
             WriteToTextFile(string.Format("writeToTextFilePath: {0}", writeToTextFilePath));
+
+            startFolder = @"C:\";
+            Console.WriteLine("startFolder: {0}", startFolder);
+            WriteToTextFile(string.Format("startFolder: {0}", startFolder));
+
+            Console.WriteLine("xLargesetFiles: {0}", xLargesetFiles);
+            WriteToTextFile(string.Format("xLargesetFiles: {0}", xLargesetFiles));
+
             QueryFilesBySize();
             Console.WriteLine("Press any key to exit");
             Console.ReadKey();
@@ -57,9 +69,6 @@ namespace QueryBySize
         {
             Console.WriteLine("Start: {0}", DateTime.Now);
             WriteToTextFile(string.Format("Start: {0}", DateTime.Now));
-            string startFolder = @"C:\Users\Titus\Documents\";
-            Console.WriteLine("startFolder: {0}", startFolder);
-            WriteToTextFile(string.Format("startFolder: {0}", startFolder));
             // Take a snapshot of the file system.  
             System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(startFolder);
 
@@ -87,8 +96,8 @@ namespace QueryBySize
                 System.Diagnostics.Debug.WriteLine(string.Format("Counter: {0}", counter));
             }
 
-            Console.WriteLine("fileList count: ", fileList.ToString());
-            WriteToTextFile(string.Format("fileList count: ", fileList.ToString()));
+            Console.WriteLine("fileList count: {0}", fileList.ToString());
+            WriteToTextFile(string.Format("fileList count: {0}", fileList.ToString()));
 
             //Return the size of the largest file  
             long maxSize =
@@ -135,20 +144,20 @@ namespace QueryBySize
 
             //Return the FileInfos for the 10 largest files  
             // queryTenLargest is an IEnumerable<System.IO.FileInfo>  
-            var queryTenLargest =
+            var queryXLargest =
                 (from file in fileList
                  let len = GetFileLength(file)
                  orderby len descending
-                 select file).Take(10);
+                 select file).Take(xLargesetFiles);
 
-            WriteToTextFile(string.Format("The 10 largest files under {0} are:", startFolder));
+            WriteToTextFile(string.Format("The {0} largest files under {1} are:", xLargesetFiles, startFolder));
 
-            foreach (var v in queryTenLargest)
+            foreach (var v in queryXLargest)
             {
                 WriteToTextFile(string.Format("{0}: {1}", v.FullName, ConverToMbAndGb(v.Length)));
             }
 
-            Console.WriteLine("Return the FileInfos for the 10 largest file DONE @ {0}", DateTime.Now);
+            Console.WriteLine("Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the FileInfos for the 10 largest file DONE @ {0}", DateTime.Now));
 
             if (performQuerySizeGroupItem == true)
@@ -180,9 +189,10 @@ namespace QueryBySize
             else
             {
                 Console.WriteLine("performQuerySizeGroupItem is FALSE.   DONE @ {0}", DateTime.Now);
+                WriteToTextFile(string.Format("performQuerySizeGroupItem is FALSE.   DONE @ {0}", DateTime.Now));
             }
 
-            Console.WriteLine("End: {0}", DateTime.Now);
+    Console.WriteLine("End: {0}", DateTime.Now);
         }
 
         static string ConverToMbAndGb(long bytes)
