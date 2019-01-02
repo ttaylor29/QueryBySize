@@ -12,7 +12,7 @@ namespace QueryBySize
         private static List<string> errorList = new List<string>();
 
         private static string writeToTextFilePath;
-        private static string writeToTextFilePathCounter;
+        //private static string writeToTextFilePathCounter;
 
         private static bool performQuerySizeGroupItem = false;
 
@@ -28,9 +28,9 @@ namespace QueryBySize
             Console.WriteLine("writeToTextFilePath: {0}", writeToTextFilePath);
             WriteToTextFile(string.Format("writeToTextFilePath: {0}", writeToTextFilePath));
 
-            writeToTextFilePathCounter = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_Counter.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            Console.WriteLine("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter);
-            WriteToTextFile(string.Format("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter));
+            //writeToTextFilePathCounter = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_Counter.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //Console.WriteLine("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter);
+            //WriteToTextFile(string.Format("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter));
 
             startFolder = @"C:\";
             Console.WriteLine("startFolder: {0}", startFolder);
