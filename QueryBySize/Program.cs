@@ -188,7 +188,7 @@ namespace QueryBySize
             counter = 0;
             foreach (var v in queryXLargest)
             {
-                WriteToTextFile(string.Format("[{0}] | {1}: {2}", counter, v.FullName, ConverToMbAndGb(v.Length)));
+                WriteToTextFile(string.Format("[{0}] | {1}: {2}", counter, ConverToMbAndGb(v.Length), v.FullName));
                 ProcessCounter(" queryXLargest ");
             }
 
