@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,6 @@ namespace QueryBySize
         private static List<string> errorList = new List<string>();
 
         private static string writeToTextFilePath;
-        //private static string writeToTextFilePathCounter;
 
         private static bool performQuerySizeGroupItem = false;
 
@@ -24,24 +24,104 @@ namespace QueryBySize
         
         static void Main(string[] args)
         {
+            Stopwatch stopwatch = new Stopwatch();
+            DateTime startTime = DateTime.Now;
+            stopwatch.Start();
+
             writeToTextFilePath = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_QueryBySize.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+
+            Console.WriteLine(string.Format("Start Time: {0}", startTime.ToString()));
+            WriteToTextFile(string.Format("Start Time: {0}", startTime.ToString()));
+
             Console.WriteLine("writeToTextFilePath: {0}", writeToTextFilePath);
             WriteToTextFile(string.Format("writeToTextFilePath: {0}", writeToTextFilePath));
 
-            //writeToTextFilePathCounter = string.Format("{0}_{1}_{2}_{3}_{4}_{5}_Counter.txt", DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            //Console.WriteLine("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter);
-            //WriteToTextFile(string.Format("writeToTextFilePathCounter: {0}", writeToTextFilePathCounter));
+            if (ValidateReadInItems() == true)
+            {
+                Console.WriteLine("startFolder: {0}", startFolder);
+                WriteToTextFile(string.Format("startFolder: {0}", startFolder));
 
-            startFolder = @"C:\";
-            Console.WriteLine("startFolder: {0}", startFolder);
-            WriteToTextFile(string.Format("startFolder: {0}", startFolder));
+                Console.WriteLine("xLargesetFiles: {0}", xLargesetFiles);
+                WriteToTextFile(string.Format("xLargesetFiles: {0}", xLargesetFiles));
 
-            Console.WriteLine("xLargesetFiles: {0}", xLargesetFiles);
-            WriteToTextFile(string.Format("xLargesetFiles: {0}", xLargesetFiles));
+                QueryFilesBySize();
+            }
 
-            QueryFilesBySize();
-            //Console.WriteLine("Press any key to exit");
-            //Console.ReadKey();
+            // Stop timing.
+            stopwatch.Stop();
+
+            TimeSpan timeSpan = stopwatch.Elapsed;
+
+            // Write result.
+            WriteToTextFile(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
+            Console.WriteLine(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
+            WriteToTextFile(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine("Check the directory where the .exe is ran from to find the .txt file with the run information!");
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey();
+        }
+
+        private static bool ValidateReadInItems()
+        {
+            var list = new List<string>();
+            using (StreamReader reader = new StreamReader(@"RequiredItems.txt"))
+            {
+                while (true)
+                {
+                    string line = reader.ReadLine();
+                    if (line == null)
+                    {
+                        break;
+                    }
+                    list.Add(line);
+                }
+            }
+
+            if (list.Count == 3)
+            {
+                startFolder = list.FirstOrDefault();
+
+                if (Directory.Exists(startFolder) == false)
+                {
+                    Console.WriteLine(string.Format("Start Path [ {0} ] does NOT exists.", startFolder));
+
+                    return false;
+                }
+
+                int tryParseInt = 0;
+
+                if (int.TryParse(list.Skip(1).Take(1).FirstOrDefault(), out tryParseInt) == true)
+                {
+                    xLargesetFiles = tryParseInt;
+                }
+
+                bool tryParseBool = false;
+
+                if (bool.TryParse(list.LastOrDefault(), out tryParseBool) == true)
+                {
+                    performQuerySizeGroupItem = tryParseBool;
+                }
+
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(string.Format("RequiredItems.txt is not formatted properly | Line 1 needs to be the start path of where to start the search ; Line 2 needs to be an integer value of the X number of files to return that are the largest ; Line 3 needs to be true or false based on if you want to perform the query size by group functionality"));
+
+                return false;
+            }
         }
 
         static IEnumerable<string> GetAllFiles(string path, string searchPattern)
@@ -67,15 +147,6 @@ namespace QueryBySize
         {
 
             using (StreamWriter writer = new StreamWriter(writeToTextFilePath, true))
-            {
-                writer.WriteLine(text);
-            }
-        }
-
-        private static void WriteToTextFileCounter(string text)
-        {
-
-            using (StreamWriter writer = new StreamWriter(writeToTextFilePathCounter, false))
             {
                 writer.WriteLine(text);
             }
@@ -139,7 +210,7 @@ namespace QueryBySize
                  .Max();
 
             WriteToTextFile(string.Format("The length of the largest file under {0} is {1}",
-                startFolder, ConverToMbAndGb(maxSize)));
+                startFolder, ConverToKbMbGb(maxSize)));
 
             Console.WriteLine("Return the size of the largest file  DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the size of the largest file  DONE @ {0}", DateTime.Now));
@@ -155,7 +226,7 @@ namespace QueryBySize
                 .First();
 
             WriteToTextFile(string.Format("The largest file under {0} is {1} with a length of {2}",
-                                startFolder, longestFile.FullName, ConverToMbAndGb(longestFile.Length)));
+                                startFolder, longestFile.FullName, ConverToKbMbGb(longestFile.Length)));
 
             Console.WriteLine("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the FileInfo object for the largest file    DONE @ {0}", DateTime.Now));
@@ -169,10 +240,14 @@ namespace QueryBySize
                  select file).First();
 
             WriteToTextFile(string.Format("The smallest file under {0} is {1} with a length of {2}",
-                                startFolder, smallestFile.FullName, ConverToMbAndGb(smallestFile.Length)));
+                                startFolder, smallestFile.FullName, ConverToKbMbGb(smallestFile.Length)));
 
             Console.WriteLine("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now);
             WriteToTextFile(string.Format("Return the FileInfo of the smallest file DONE @ {0}", DateTime.Now));
+
+
+            Console.WriteLine("Start - Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Start - Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now));
 
             //Return the FileInfos for the 10 largest files  
             // queryTenLargest is an IEnumerable<System.IO.FileInfo>  
@@ -188,16 +263,18 @@ namespace QueryBySize
             counter = 0;
             foreach (var v in queryXLargest)
             {
-                WriteToTextFile(string.Format("[{0}] | {1}: {2}", counter, ConverToMbAndGb(v.Length), v.FullName));
+                WriteToTextFile(string.Format("[{0}] | {1}: {2}", counter, ConverToKbMbGb(v.Length), v.FullName));
                 ProcessCounter(" queryXLargest ");
             }
 
-            Console.WriteLine("Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now);
-            WriteToTextFile(string.Format("Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now));
+            Console.WriteLine("Start - Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now);
+            WriteToTextFile(string.Format("Start - Return the FileInfos for the X largest file DONE @ {0}", DateTime.Now));
 
             if (performQuerySizeGroupItem == true)
             {
 
+                Console.WriteLine("Start - Group the files according to their size, leaving out files that are less than 200000 bytes.   DONE @ {0}", DateTime.Now);
+                WriteToTextFile(string.Format("Start - Group the files according to their size, leaving out files that are less than 200000 bytes.   DONE @ {0}", DateTime.Now));
                 // Group the files according to their size, leaving out  
                 // files that are less than 200000 bytes.   
                 var querySizeGroups =
@@ -209,12 +286,15 @@ namespace QueryBySize
                     orderby fileGroup.Key descending
                     select fileGroup;
 
+                Console.WriteLine("Counter reset for: querySizeGroups @ {0}", DateTime.Now);
+                counter = 0;
                 foreach (var filegroup in querySizeGroups)
                 {
-                    WriteToTextFile(string.Format(filegroup.Key.ToString() + "00000"));
+                    WriteToTextFile(string.Format(ConverToKbMbGb(filegroup.Key)));
                     foreach (var item in filegroup)
                     {
-                        WriteToTextFile(string.Format("\t{0}: {1}", item.Name, ConverToMbAndGb(item.Length)));
+                        WriteToTextFile(string.Format("\t{0}: {1}", item.Name, ConverToKbMbGb(item.Length)));
+                        ProcessCounter(" querySizeGroups ");
                     }
                 }
 
@@ -230,12 +310,13 @@ namespace QueryBySize
             Console.WriteLine("End: {0}", DateTime.Now);
         }
 
-        static string ConverToMbAndGb(long bytes)
+        static string ConverToKbMbGb(long bytes)
         {
+            string kilobytes1 = string.Format("{0} kilobytes", ConvertSize(bytes, "KB").ToString("0.00"));
             string megabytes1 = string.Format("{0} megabytes", ConvertSize(bytes, "MB").ToString("0.00"));
             string gigabytes1 = string.Format("{0} gigabytes", ConvertSize(bytes, "GB").ToString("0.00"));
 
-            return string.Format("[ {0} | {1} ]", megabytes1, gigabytes1);
+            return string.Format("[ {0} | {1} | {2}]", kilobytes1, megabytes1, gigabytes1);
         }
 
         static double ConvertBytesToMegabytes(long bytes)
