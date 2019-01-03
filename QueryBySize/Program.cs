@@ -45,6 +45,13 @@ namespace QueryBySize
                 WriteToTextFile(string.Format("xLargesetFiles: {0}", xLargesetFiles));
 
                 QueryFilesBySize();
+
+                Console.WriteLine(string.Empty);
+                Console.WriteLine(string.Empty);
+                Console.WriteLine(string.Empty);
+                Console.WriteLine("Check the directory where the .exe is ran from to find the .txt  [ {0} ] file with the RUN information!", writeToTextFilePath);
+                Console.WriteLine(string.Empty);
+                Console.WriteLine(string.Empty);
             }
 
             // Stop timing.
@@ -53,18 +60,14 @@ namespace QueryBySize
             TimeSpan timeSpan = stopwatch.Elapsed;
 
             // Write result.
+            Console.WriteLine(string.Empty);
+            Console.WriteLine(string.Empty);
             WriteToTextFile(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
             Console.WriteLine(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
             WriteToTextFile(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
-            Console.WriteLine(string.Empty);
-            Console.WriteLine(string.Empty);
-            Console.WriteLine(string.Empty);
-            Console.WriteLine(string.Empty);
-            Console.WriteLine(string.Empty);
-            Console.WriteLine("Check the directory where the .exe is ran from to find the .txt file with the run information!");
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
@@ -95,7 +98,7 @@ namespace QueryBySize
 
                 if (Directory.Exists(startFolder) == false)
                 {
-                    Console.WriteLine(string.Format("Start Path [ {0} ] does NOT exists.", startFolder));
+                    Console.WriteLine(string.Format("Start Path [ {0} ] is NOT found.", startFolder));
 
                     return false;
                 }
@@ -202,6 +205,7 @@ namespace QueryBySize
             Console.WriteLine("fileList count: {0}", fileList.Count.ToString());
             WriteToTextFile(string.Format("fileList count: {0}", fileList.Count.ToString()));
 
+            Console.WriteLine("Processing...  Please wait... ");
             //Return the size of the largest file  
             long maxSize =
                 (from file in fileList
