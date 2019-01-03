@@ -44,6 +44,9 @@ namespace QueryBySize
                 Console.WriteLine("xLargesetFiles: {0}", xLargesetFiles);
                 WriteToTextFile(string.Format("xLargesetFiles: {0}", xLargesetFiles));
 
+                Console.WriteLine("performQuerySizeGroupItem: {0}", performQuerySizeGroupItem);
+                WriteToTextFile(string.Format("performQuerySizeGroupItem: {0}", performQuerySizeGroupItem));
+
                 QueryFilesBySize();
 
                 Console.WriteLine(string.Empty);
@@ -204,10 +207,10 @@ namespace QueryBySize
                 ProcessCounter(" fileList.Add(...) ");
             }
 
-            Console.WriteLine("fileList count: {0}", fileList.Count.ToString());
-            WriteToTextFile(string.Format("fileList count: {0}", fileList.Count.ToString()));
+            Console.WriteLine("Total File count: {0}", fileList.Count.ToString());
+            WriteToTextFile(string.Format("Total File count: {0}", fileList.Count.ToString()));
 
-            Console.WriteLine("Processing...  Please wait... ");
+            Console.WriteLine("Processing...  Please wait... This could take some time based on how many files were found etc.");
             //Return the size of the largest file  
             long maxSize =
                 (from file in fileList
