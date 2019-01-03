@@ -62,11 +62,13 @@ namespace QueryBySize
             // Write result.
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
+            WriteToTextFile(string.Format(string.Empty)); WriteToTextFile(string.Format(string.Empty));
             WriteToTextFile(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
             Console.WriteLine(string.Format("Time elapsed: {0}", stopwatch.Elapsed));
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
+            WriteToTextFile(string.Format(string.Empty)); WriteToTextFile(string.Format(string.Empty));
             WriteToTextFile(string.Format("Time: {0}h {1}m {2}s {3}ms", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds));
             Console.WriteLine(string.Empty);
             Console.WriteLine(string.Empty);
